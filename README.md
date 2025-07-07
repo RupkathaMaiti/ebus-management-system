@@ -211,10 +211,365 @@ Modularization: For larger applications, break down script.js into smaller, more
 Framework Adoption: For more complex UIs and state management, consider adopting a JavaScript framework like React, Vue.js, or Angular.
 
 Test Cases
-(To be filled in by you later, e.g., "Test Case 1: User Registration - Valid email/password. Expected: User created in Auth and Firestore, logged in, sees user panel.")
+This section outlines a set of test cases to verify the functionality and behavior of the Ebus Management System. These tests cover various user roles and core features.
 
-Project Report
-(Mention that a detailed project report will accompany this code, covering system design, architecture, challenges, etc.)
+Authentication & Role Management
+Test Case: User Registration (Valid)
+
+Scenario: A new user registers with a valid, unique email and a password (min 6 chars).
+
+Steps:
+
+Navigate to the registration form.
+
+Enter valid email (e.g., newuser@example.com).
+
+Enter a password (e.g., password123).
+
+Click "Register".
+
+Expected Result:
+
+"Registration successful!" message displayed.
+
+User is automatically logged in.
+
+User's email and (user) role are displayed in the header.
+
+Only "Live Bus Information (User Module)" is visible.
+
+A new user entry exists in Firebase Authentication.
+
+A corresponding document with role: 'user' exists in Firestore users collection (Document ID = User UID).
+
+Test Case: User Registration (Invalid - Email Exists)
+
+Scenario: A user tries to register with an email that already exists.
+
+Steps:
+
+Navigate to the registration form.
+
+Enter an existing email (e.g., existing@example.com).
+
+Enter a password.
+
+Click "Register".
+
+Expected Result:
+
+"Registration failed: Firebase: The email address is already in use by another account." message displayed.
+
+User remains on the registration form, not logged in.
+
+Test Case: User Registration (Invalid - Short Password)
+
+Scenario: A user tries to register with a password less than 6 characters.
+
+Steps:
+
+Navigate to the registration form.
+
+Enter a valid email.
+
+Enter a short password (e.g., 123).
+
+Click "Register".
+
+Expected Result:
+
+"Password should be at least 6 characters." message displayed.
+
+User remains on the registration form, not logged in.
+
+Test Case: User Login (Valid - User Role)
+
+Scenario: A registered user (with role: 'user') logs in successfully.
+
+Steps:
+
+Navigate to the login form.
+
+Enter valid user email and password.
+
+Click "Login".
+
+Expected Result:
+
+"Login successful! Welcome, [email] (user)." message displayed.
+
+User's email and (user) role are displayed in the header.
+
+Only "Live Bus Information (User Module)" is visible.
+
+Test Case: User Login (Valid - Driver Role)
+
+Scenario: A registered driver (with role: 'driver') logs in successfully.
+
+Steps:
+
+Navigate to the login form.
+
+Enter valid driver email and password.
+
+Click "Login".
+
+Expected Result:
+
+"Login successful! Welcome, [email] (driver)." message displayed.
+
+Driver's email and (driver) role are displayed in the header.
+
+"Post Bus Information (Driver Module)" and "Live Bus Information (User Module)" are visible.
+
+Test Case: User Login (Valid - Admin Role)
+
+Scenario: A registered admin (with role: 'admin') logs in successfully.
+
+Steps:
+
+Navigate to the login form.
+
+Enter valid admin email and password.
+
+Click "Login".
+
+Expected Result:
+
+"Login successful! Welcome, [email] (admin)." message displayed.
+
+Admin's email and (admin) role are displayed in the header.
+
+"Admin Panel: Register Driver", "Post Bus Information (Driver Module)", and "Live Bus Information (User Module)" are all visible.
+
+Test Case: User Login (Invalid Credentials)
+
+Scenario: A user tries to log in with incorrect email or password.
+
+Steps:
+
+Navigate to the login form.
+
+Enter incorrect email/password.
+
+Click "Login".
+
+Expected Result:
+
+"Login failed: Firebase: Error (auth/invalid-credential)." or similar error message displayed.
+
+User remains on the login form, not logged in.
+
+Test Case: Logout Functionality
+
+Scenario: A logged-in user logs out.
+
+Steps:
+
+Log in as any user type.
+
+Click "Logout".
+
+Expected Result:
+
+Application returns to the authentication (login/register) view.
+
+User email display in header is cleared.
+
+All role-specific content sections are hidden.
+
+Test Case: Admin Registers Driver (Valid)
+
+Scenario: An admin user registers a new driver account.
+
+Steps:
+
+Log in as an Admin.
+
+In the "Admin Panel: Register Driver" section, enter a new, valid email and password for a driver.
+
+Click "Register Driver".
+
+Expected Result:
+
+"Registration successful! User [email] created as driver." message displayed.
+
+New driver account appears in Firebase Authentication.
+
+A document with role: 'driver' exists in Firestore users collection for the new driver.
+
+Input fields are cleared.
+
+Bus Information Management
+Test Case: Driver Posts Bus Information (Valid)
+
+Scenario: A driver (or admin) posts complete and valid bus information.
+
+Steps:
+
+Log in as a Driver or Admin.
+
+In the "Post Bus Information" section, fill in all fields (Bus Number, Route, Bus Type, Contact Info).
+
+Click "Post Bus Information".
+
+Expected Result:
+
+Input fields are cleared.
+
+The newly posted bus appears in the "Live Bus Information" list.
+
+A new document for the bus exists in Firestore buses collection.
+
+Test Case: Driver Posts Bus Information (Missing Fields)
+
+Scenario: A driver (or admin) attempts to post bus information with one or more fields left empty.
+
+Steps:
+
+Log in as a Driver or Admin.
+
+In the "Post Bus Information" section, leave one or more fields empty.
+
+Click "Post Bus Information".
+
+Expected Result:
+
+alert() message "Please fill in all bus information fields..." displayed.
+
+Bus information is NOT posted to Firestore.
+
+Input fields are NOT cleared.
+
+Test Case: Regular User Attempts to Post Bus Information
+
+Scenario: A regular user (with role: 'user') tries to post bus information.
+
+Steps:
+
+Log in as a User.
+
+(Attempt to click the hidden "Post Bus Information" button if it were visible, or observe that the section is hidden).
+
+Expected Result:
+
+The "Post Bus Information (Driver Module)" section is not visible to the user.
+
+(If the button were somehow clicked) alert() message "Only users with a 'driver' or 'admin' role can post bus information." displayed.
+
+Bus Search & Display
+Test Case: Display All Buses (No Search Filters)
+
+Scenario: A user logs in or clears search filters.
+
+Steps:
+
+Log in as any user type.
+
+Ensure Source and Destination search fields are empty.
+
+(If previously searched) Click "Clear Search".
+
+Expected Result:
+
+All bus entries currently in Firestore are displayed in the "Live Bus Information" list.
+
+"No bus information available yet." message if no buses are posted.
+
+Test Case: Search by Source Only (Valid Match)
+
+Scenario: A user searches for buses by a valid source that exists in some routes.
+
+Steps:
+
+Log in as any user type.
+
+Enter a source (e.g., "Kharagpur") in the "Source" field.
+
+Leave "Destination" empty.
+
+Click "Search Buses".
+
+Expected Result:
+
+Only buses whose route string contains "Kharagpur" (case-insensitive) are displayed.
+
+Buses not matching the source are hidden.
+
+Test Case: Search by Destination Only (Valid Match)
+
+Scenario: A user searches for buses by a valid destination that exists in some routes.
+
+Steps:
+
+Log in as any user type.
+
+Leave "Source" empty.
+
+Enter a destination (e.g., "Kolkata") in the "Destination" field.
+
+Click "Search Buses".
+
+Expected Result:
+
+Only buses whose route string contains "Kolkata" (case-insensitive) are displayed.
+
+Buses not matching the destination are hidden.
+
+Test Case: Search by Both Source and Destination (Valid Match)
+
+Scenario: A user searches for buses by both source and destination, and a match exists.
+
+Steps:
+
+Log in as any user type.
+
+Enter a source (e.g., "Kharagpur") in the "Source" field.
+
+Enter a destination (e.g., "Kolkata") in the "Destination" field.
+
+Click "Search Buses".
+
+Expected Result:
+
+Only buses whose route string contains both "Kharagpur" AND "Kolkata" (case-insensitive) are displayed.
+
+Test Case: Search (No Match Found)
+
+Scenario: A user searches for criteria that do not match any existing bus routes.
+
+Steps:
+
+Log in as any user type.
+
+Enter a unique, non-existent source/destination (e.g., Source: "Moon", Destination: "Mars").
+
+Click "Search Buses".
+
+Expected Result:
+
+"No buses found matching your search criteria." message displayed.
+
+No bus cards are visible.
+
+Test Case: Clear Search Filters
+
+Scenario: A user clears active search filters.
+
+Steps:
+
+Perform a search that filters the bus list.
+
+Click "Clear Search".
+
+Expected Result:
+
+"Source" and "Destination" input fields are cleared.
+
+All bus entries currently in Firestore are displayed again.
+
 
 Contact
-(Your Name/Email/GitHub Profile)
+Name-Rupkatha Maiti
+Email-rupkatha.maitie@gmail.com
+GitHub Profile-https://github.com/RupkathaMaiti)
