@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ebus Management System</title>
+    <!-- Link to your custom style.css for visual presentation -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase Initialization (YOUR PROVIDED MODULAR SDK CODE) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        // NEW: Import Authentication functions
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration (USE YOUR ACTUAL VALUES HERE!)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBis8BMxsBqDsB7L-VoNTBEB_pFK4BeWcw", // YOUR API KEY
+            authDomain: "ebus-management-system-27b5a.firebaseapp.com", // YOUR AUTH DOMAIN
+            projectId: "ebus-management-system-27b5a", // YOUR PROJECT ID
+            storageBucket: "ebus-management-system-27b5a.firebasestorage.app", // YOUR STORAGE BUCKET
+            messagingSenderId: "89727292496", // YOUR MESSAGING SENDER ID
+            appId: "1:89727292496:web:8e58d787919d1f124ced55", // YOUR APP ID
+        };
+
+        // Initialize Firebase App
+        const app = initializeApp(firebaseConfig);
+
+        // Make Firebase services and Firestore functions globally accessible for script.js
+        window.db = getFirestore(app);
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.serverTimestamp = serverTimestamp;
+        window.doc = doc; // NEW: Make doc function available
+        window.setDoc = setDoc; // NEW: Make setDoc function available
+        window.getDoc = getDoc; // NEW: Make getDoc function available
+
+        // Authentication services and functions
+        window.auth = getAuth(app);
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+
+        window.dispatchEvent(new Event('firebaseReady'));
+
+    </script>
+</head>
+<body>
+    <!-- Authentication Section - This will be visible initially when no one is logged in -->
+    <div id="authSection" class="auth-container">
+        <h1 class="auth-title">Welcome to Ebus System!</h1>
+        <p class="auth-subtitle">Please Register or Login to continue.</p>
+
+        <!-- Registration Form -->
+        <div id="registerForm" class="auth-card">
+            <h2>Register as User</h2>
+            <div>
+                <label for="registerEmail">Email:</label>
+                <input type="email" id="registerEmail" placeholder="your@example.com">
+            </div>
+            <div>
+                <label for="registerPassword">Password:</label>
+                <input type="password" id="registerPassword" placeholder="minimum 6 characters">
+            </div>
+            <button id="registerButton">Register</button>
+            <p class="toggle-link">Already have an account? <a href="#" id="showLogin">Login here</a></p>
+            <p id="registerMessage" class="message-area"></p>
+        </div>
+
+        <!-- Login Form - Hidden initially by default CSS class -->
+        <div id="loginForm" class="auth-card hidden">
+            <h2>Login</h2>
+            <div>
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" placeholder="your@example.com">
+            </div>
+            <div>
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" placeholder="your password">
+            </div>
+            <button id="loginButton">Login</button>
+            <p class="toggle-link">Don't have an account? <a href="#" id="showRegister">Register here</a></p>
+            <p id="loginMessage" class="message-area"></p>
+        </div>
+    </div>
+
+    <!-- Main Application Content - Hidden initially by default CSS class -->
+    <div id="mainAppContent" class="main-app-container hidden">
+        <!-- Header bar for logged-in user info and logout button -->
+        <div class="header-bar">
+            <span id="userEmailDisplay" class="user-email"></span>
+            <button id="logoutButton" class="logout-button">Logout</button>
+        </div>
+
+        <h1>Hello Ebus Management System!</h1>
+        <p>This is your central hub for bus information.</p>
+
+        <!-- Admin Section - Hidden by default, only visible to Admin role -->
+        <div id="adminSection" class="role-section hidden">
+            <h2>Admin Panel: Register Driver</h2>
+            <p>Only administrators can create new driver accounts.</p>
+            <div>
+                <label for="adminRegisterEmail">Driver Email:</label>
+                <input type="email" id="adminRegisterEmail" placeholder="driver@example.com">
+            </div>
+            <div>
+                <label for="adminRegisterPassword">Driver Password:</label>
+                <input type="password" id="adminRegisterPassword" placeholder="min 6 characters">
+            </div>
+            <button id="adminRegisterDriverButton">Register Driver</button>
+            <p id="adminRegisterMessage" class="message-area"></p>
+        </div>
+
+        <!-- Driver Section - Hidden by default, only visible to Driver role -->
+        <!-- Driver Section - Hidden by default, only visible to Driver role -->
+<div id="driverSection" class="role-section hidden">
+    <h2>Post Bus Information (Driver Module)</h2>
+    <div>
+        <label for="busNumber">Bus Number:</label>
+        <input type="text" id="busNumber" placeholder="e.g., WB-01-A-1234">
+    </div>
+    <br>
+    <div>
+        <label for="busRoute">Bus Route:</label>
+        <input type="text" id="busRoute" placeholder="e.g., Kharagpur to Kolkata">
+    </div>
+    <br>
+    <!-- NEW: Bus Type Input -->
+    <div>
+        <label for="busType">Bus Type:</label>
+        <input type="text" id="busType" placeholder="e.g., AC, Non-AC, Sleeper">
+    </div>
+    <br>
+    <!-- NEW: Contact Input -->
+    <div>
+        <label for="contactInfo">Contact Info:</label>
+        <input type="text" id="contactInfo" placeholder="e.g., 9876543210">
+    </div>
+    <br>
+    <button id="postBusInfoButton">Post Bus Information</button>
+</div>
+
+        <!-- User Section - Visible to all logged-in users (including Admin/Driver) -->
+<div id="userSection" class="role-section">
+    <h2>Live Bus Information (User Module)</h2>
+
+    <!-- NEW: Search Inputs and Button -->
+    <div class="search-controls">
+        <div>
+            <label for="searchSource">Source:</label>
+            <input type="text" id="searchSource" placeholder="e.g., Kharagpur">
+        </div>
+        <br>
+        <div>
+            <label for="searchDestination">Destination:</label>
+            <input type="text" id="searchDestination" placeholder="e.g., Kolkata">
+        </div>
+        <br>
+        <button id="searchButton">Search Buses</button>
+        <button id="clearSearchButton" class="secondary-button">Clear Search</button> <!-- NEW: Clear button -->
+    </div>
+    <br> <!-- Add a break after search controls -->
+
+    <div id="busInfoDisplay">
+        No bus information posted yet.
+    </div>
+</div>
+
+    <!-- Link to your custom JavaScript file. -->
+    <script src="script.js"></script>
+</body>
+</html>
