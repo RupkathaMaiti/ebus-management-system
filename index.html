@@ -12,23 +12,25 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-        // NEW: Import Authentication functions
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
         // Your web app's Firebase configuration (USE YOUR ACTUAL VALUES HERE!)
+        // IMPORTANT: Ensure 'messagingSenderId' and 'appId' are filled with your actual values from Firebase Console -> Project settings -> Your apps -> Web app
         const firebaseConfig = {
-            apiKey: "AIzaSyD33mu9QEyyiG_6ZjLRyyYy_qIzN85HpmA", // <--- THIS IS YOUR NEW KEY
+            apiKey: "AIzaSyD33mu9QEyyiG_6ZjLRyyYy_qIzN85HpmA", // Your NEW, RESTRICTED API Key
             authDomain: "ebus-management-system-27b5a.firebaseapp.com",
             projectId: "ebus-management-system-27b5a",
             storageBucket: "ebus-management-system-27b5a.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // <--- FILL THIS IN
+            appId: "YOUR_APP_ID", // <--- FILL THIS IN
+            // measurementId: "YOUR_MEASUREMENT_ID" // Optional
         };
-
+        
         // Initialize Firebase App
         const app = initializeApp(firebaseConfig);
 
         // Make Firebase services and Firestore functions globally accessible for script.js
+        // This is crucial for script.js to access these functions after firebaseReady event
         window.db = getFirestore(app);
         window.collection = collection;
         window.addDoc = addDoc;
@@ -36,9 +38,9 @@
         window.query = query;
         window.orderBy = orderBy;
         window.serverTimestamp = serverTimestamp;
-        window.doc = doc; // NEW: Make doc function available
-        window.setDoc = setDoc; // NEW: Make setDoc function available
-        window.getDoc = getDoc; // NEW: Make getDoc function available
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
 
         // Authentication services and functions
         window.auth = getAuth(app);
@@ -47,7 +49,21 @@
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
 
+        // Dispatch a custom event when Firebase is fully initialized and functions are exposed
         window.dispatchEvent(new Event('firebaseReady'));
+
+        // IMPORTANT: Your script.js MUST listen for this 'firebaseReady' event
+        // before attempting to use any of the window.auth, window.db,
+        // or other window.Firebase functions.
+        // Example in script.js:
+        // window.addEventListener('firebaseReady', () => {
+        //     // All your main script.js logic goes here
+        //     // e.g., event listeners for buttons, initial data fetches, etc.
+        //     document.getElementById('loginButton').addEventListener('click', async () => {
+        //         // Now signInWithEmailAndPassword will be defined
+        //         // ...
+        //     });
+        // });
 
     </script>
 </head>
@@ -118,61 +134,62 @@
         </div>
 
         <!-- Driver Section - Hidden by default, only visible to Driver role -->
-        <!-- Driver Section - Hidden by default, only visible to Driver role -->
-<div id="driverSection" class="role-section hidden">
-    <h2>Post Bus Information (Driver Module)</h2>
-    <div>
-        <label for="busNumber">Bus Number:</label>
-        <input type="text" id="busNumber" placeholder="e.g., WB-01-A-1234">
-    </div>
-    <br>
-    <div>
-        <label for="busRoute">Bus Route:</label>
-        <input type="text" id="busRoute" placeholder="e.g., Kharagpur to Kolkata">
-    </div>
-    <br>
-    <!-- NEW: Bus Type Input -->
-    <div>
-        <label for="busType">Bus Type:</label>
-        <input type="text" id="busType" placeholder="e.g., AC, Non-AC, Sleeper">
-    </div>
-    <br>
-    <!-- NEW: Contact Input -->
-    <div>
-        <label for="contactInfo">Contact Info:</label>
-        <input type="text" id="contactInfo" placeholder="e.g., 9876543210">
-    </div>
-    <br>
-    <button id="postBusInfoButton">Post Bus Information</button>
-</div>
+        <div id="driverSection" class="role-section hidden">
+            <h2>Post Bus Information (Driver Module)</h2>
+            <div>
+                <label for="busNumber">Bus Number:</label>
+                <input type="text" id="busNumber" placeholder="e.g., WB-01-A-1234">
+            </div>
+            <br>
+            <div>
+                <label for="busRoute">Bus Route:</label>
+                <input type="text" id="busRoute" placeholder="e.g., Kharagpur to Kolkata">
+            </div>
+            <br>
+            <!-- NEW: Bus Type Input -->
+            <div>
+                <label for="busType">Bus Type:</label>
+                <input type="text" id="busType" placeholder="e.g., AC, Non-AC, Sleeper">
+            </div>
+            <br>
+            <!-- NEW: Contact Input -->
+            <div>
+                <label for="contactInfo">Contact Info:</label>
+                <input type="text" id="contactInfo" placeholder="e.g., 9876543210">
+            </div>
+            <br>
+            <button id="postBusInfoButton">Post Bus Information</button>
+        </div>
 
         <!-- User Section - Visible to all logged-in users (including Admin/Driver) -->
-<div id="userSection" class="role-section">
-    <h2>Live Bus Information (User Module)</h2>
+        <div id="userSection" class="role-section">
+            <h2>Live Bus Information (User Module)</h2>
 
-    <!-- NEW: Search Inputs and Button -->
-    <div class="search-controls">
-        <div>
-            <label for="searchSource">Source:</label>
-            <input type="text" id="searchSource" placeholder="e.g., Kharagpur">
-        </div>
-        <br>
-        <div>
-            <label for="searchDestination">Destination:</label>
-            <input type="text" id="searchDestination" placeholder="e.g., Kolkata">
-        </div>
-        <br>
-        <button id="searchButton">Search Buses</button>
-        <button id="clearSearchButton" class="secondary-button">Clear Search</button> <!-- NEW: Clear button -->
-    </div>
-    <br> <!-- Add a break after search controls -->
+            <!-- NEW: Search Inputs and Button -->
+            <div class="search-controls">
+                <div>
+                    <label for="searchSource">Source:</label>
+                    <input type="text" id="searchSource" placeholder="e.g., Kharagpur">
+                </div>
+                <br>
+                <div>
+                    <label for="searchDestination">Destination:</label>
+                    <input type="text" id="searchDestination" placeholder="e.g., Kolkata">
+                </div>
+                <br>
+                <button id="searchButton">Search Buses</button>
+                <button id="clearSearchButton" class="secondary-button">Clear Search</button>
+            </div>
+            <br>
 
-    <div id="busInfoDisplay">
-        No bus information posted yet.
+            <div id="busInfoDisplay">
+                No bus information posted yet.
+            </div>
+        </div>
     </div>
-</div>
 
     <!-- Link to your custom JavaScript file. -->
     <script src="script.js"></script>
 </body>
 </html>
+
